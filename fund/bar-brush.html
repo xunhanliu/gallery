@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+       <link rel="stylesheet" href="../css/bootstrap.css" type="text/css" />
+   </head>
+   <body style="height: 100%; margin: 0">
+
+
+       <div style="height:600px;width:600px;border-radius:5px;background:#fff;box-shadow:0 0 10px 5px #aaa">
+           <div style="height:30px;width:100%;border-radius:5px;background:#F8F9F9;border-bottom:1px solid #F0F0F0">
+               <span style="line-height:30px;margin-left:18px">haha</span>
+               <span style="float:right;line-height:30px;margin-right:18px;color:#5396E3;cursor:pointer"
+                     onclick="mapTooltipClick(this);">点击查看详情</span>
+           </div>
+           <div style="height:80px;width:100%;background:#fff">
+               <div style="padding-left:18px;padding-top:11px">
+                   <span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:rgba(92,169,235,1)"></span>
+                   <span>1002-->3563</span>
+
+               </div>
+               <div style="padding-left:18px;padding-top:11px">
+                   <span style="display:inline-block;margin-right:5px;width:10px;height:10px;background-color:rgba(92,169,235,1)"></span>
+                   <span>总数据量： 1212121条</span>
+                   <span style="float:right;margin-right:18px">
+                       wordCloud数据：
+                       <select class="selectpicker" data-style="btn-success">
+                          <option value="全选">发送和接收</option>
+                          <option value="发送">发送</option>
+                          <option value="接收">接收</option>
+                        </select>
+                       table显示数据：
+                       <select class="selectpicker" data-style="btn-success">
+                          <option value="发送">发送</option>
+                          <option value="接收">接收</option>
+                        </select>
+                   </span>
+               </div>
+           </div>
+           <div id="tooltipBarId" style="height:480px;width:100%;border-radius:0 0 5px 0;background:#fff"></div>
+       </div>
+       <script src="../lib/jquery.js"></script>
+       <script src="../lib/bootstrap.js"></script>
+       <script src="../lib/echarts/echarts.min.js"></script>
+       <script src="../lib/echarts-gl/echarts-gl.min.js"></script>
+       <script src="../lib/echarts-stat/ecStat.min.js"></script>
+       <script src="../lib/echarts/extension/dataTool.min.js"></script>
+       <script src="../lib/echarts/map/js/china.js"></script>
+       <script src="../lib/echarts/map/js/world.js"></script>
+       <script src="../lib/echarts/extension/bmap.min.js"></script>
+       <script src="../lib/simplex.js"></script> 
+       <script type="text/javascript">
+var dom = document.getElementById("tooltipBarId");
+var myChart = echarts.init(dom);
+var app = {};
+option = null;
+app.title = '柱状图框选';
+
+var xAxisData = [];
+var data1 = [];
+var data2 = [];
+
+for (var i = 0; i < 4; i++) {
+    xAxisData.push('Class' + i);
+    data1.push((Math.random() * 2).toFixed(2));
+    data2.push(-Math.random().toFixed(2));
+
+}
+
+var sunburstData = [{
+    name: '入',
+	value:80,
+    itemStyle: {color: '#75d075'},
+    children: [{
+        name: '1',
+        value: 20,
+        itemStyle: {color: '#7c92e9'} }, 
+		{
+        name: '2',
+        value: 20,
+        itemStyle: {color: '#f0f075'}},
+		{
+        name: '3',
+        value: 20,
+        itemStyle: {color: '#ffa840'}},
+		{
+        name: '4',
+        value: 20,
+        itemStyle: {color: '#f568fd'}   
+    }]
+}, {
+    name: '出',
+	value:80,
+    itemStyle: {color: '#ff6666'},
+    children: [{
+        name: '1',
+        value: 20,
+        itemStyle: {color: '#7c92e9'}}, 
+		{
+            name: '2',
+            value: 20,
+            itemStyle: {color: '#f0f075'}
+        },
+     {
+        name: '3',
+        value: 20,
+        itemStyle: {color: '#ffa840'}      
+    },
+     {
+        name: '4',
+        value: 20,
+        itemStyle: {color: '#f568fd'}        
+    }]
+}];
+option = {
+    grid: [{
+        top: 50,
+        width: '40%',
+        height: '30%',
+        left: 0,
+        containLabel: true,
+		legend: {
+				data: ['bar', 'bar2', 'bar3', 'bar4'],
+				align: 'left',
+				left: 10
+			},
+		tooltip : {
+        trigger: 'axis',
+        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    }, {
+        top: 50,
+        width: '30%',
+        height: '30%',
+        right: 0,
+        containLabel: true
+    },
+    {
+        button: 0,
+        width: '40%',
+        height: '30%',
+        left: 0,
+        containLabel: true
+    }, {
+        button: 0,
+        width: '40%',
+        height: '30%',
+        right: 0,
+        containLabel: true
+    }],
+    backgroundColor: '#eee',
+    
+     
+    xAxis: {
+        gridIndex: 0,
+        data: xAxisData,
+        name: 'X Axis',
+        silent: false,
+        axisLine: {onZero: true},
+        splitLine: {show: false},
+        splitArea: {show: false}
+    },
+    yAxis: {
+        gridIndex: 0,
+        name: 'Y Axis',
+        splitArea: {show: false}
+    },
+	itemStyle : {
+        emphasis: {
+            barBorderWidth: 1,
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0,
+            shadowColor: 'rgba(0,0,0,0.5)'
+        }
+    },
+    
+    series: [
+        {
+		
+			
+			
+			toolbox: {
+				feature: {
+					magicType: {
+						type: ['line','bar', 'tiled']
+					},
+					dataView: {}
+				}
+			},
+            name: 'bar',
+            type: 'bar',
+            stack: 'one',
+            data: data1
+        },
+        {
+			
+			
+			toolbox: {
+				feature: {
+					magicType: {
+						type: ['line','bar', 'tiled']
+					},
+					dataView: {}
+				}
+			},
+            name: 'bar2',
+            type: 'bar',
+            stack: 'one',
+            data: data2
+        }
+		,
+		{type: 'sunburst',
+		
+        // highlightPolicy: 'ancestor',
+        data: sunburstData,
+        radius: [0, '40%'],
+        center: ['75%', '25%'],
+        label: {
+            color:'#444',
+            fontSize:10,
+            rotate: 'radial',
+            formatter: "{b}\n{c} ({d}%)"
+        }}
+	]
+};
+
+myChart.on('brushSelected', renderBrushed);
+
+function renderBrushed(params) {
+    var brushed = [];
+    var brushComponent = params.batch[0];
+
+    for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
+        var rawIndices = brushComponent.selected[sIdx].dataIndex;
+        brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
+    }
+
+    myChart.setOption({
+        title: {
+            backgroundColor: '#333',
+            text: 'SELECTED DATA INDICES: \n' + brushed.join('\n'),
+            bottom: 0,
+            right: 0,
+            width: 100,
+            textStyle: {
+                fontSize: 12,
+                color: '#fff'
+            }
+        }
+    });
+};
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+       </script>
+   </body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+   <head>
+       <meta charset="utf-8">
+	   <link rel="stylesheet" href="../css/bootstrap.css" type="text/css" />
+   </head>
+   <body style="height: 100%; margin: 0">
+   <div class="container">
+	<form class="form-horizontal" role="form">
+	   <div class="form-group has-success">
+			<label class="col-sm-2 control-label" for="email_threshold">
+				email数目阈值(小于等于此值的边不显示)：
+			</label>
+			<div class="col-sm-3">
+				<input type="text" class="form-control" id="email_threshold" placeholder="10">
+			</div>
+		</div>
+
+       <label class="checkbox-inline">
+        <input type="checkbox" id="inlineCheckbox1" value="option1"> 选项 1
+       </label>
+       <select class=btn-success">
+          <option value="PA">Pennsylvania</option>
+          <option value="CT">Connecticut</option>
+          <option value="NY">New York</option>
+          <option value="MD">Maryland</option>
+          <option value="VA">Virginia</option>
+        </select>
+
+		</form></div>
+		<div id="container1" style="height: 100%"></div>
+	
+	 
+</div>
+		<script src="../lib/jquery.js"></script>
+	   <script src="../lib/bootstrap.js"></script>
+       <script src="../lib/echarts/echarts.min.js"></script>
+       <script src="../lib/echarts-gl/echarts-gl.min.js"></script>
+       <script src="../lib/echarts-stat/ecStat.min.js"></script>
+       <script src="../lib/echarts/extension/dataTool.min.js"></script>
+       <script src="../lib/echarts/map/js/china.js"></script>
+       <script src="../lib/echarts/map/js/world.js"></script>
+       <script src="../lib/echarts/extension/bmap.min.js"></script>
+       <script src="../lib/simplex.js"></script>    
+	   <script src="../lib/mySubject.js"></script>  
+	   <script src="../lib/d3.js"></script>
+       <script type="text/javascript">
+	function getLinks(links,threshold)
+	{
+		//links为数组
+		//{"links": [{"id": "0", "value": 3, "source": "0", "name": "", "target": "7"}
+		var linkBuf=[];
+		for (var i = 0; i < links.length; i++) {
+			if(links[i]['value']>threshold)
+				linkBuf.push(links[i]);
+        }
+		return linkBuf; 
+	}
+	  $("#email_threshold").change(function(){
+			//var ddd=data;
+			//重新设置links
+			var linkBuf={};
+			var num=$("#email_threshold").val()
+			if(isNaN(num)){
+				alert("输入框内不是数字");
+				return;
+			}
+			myChart.setOption({
+            series: [{links:getLinks(data.links,num)}]
+        });
+			
+		});
+var linear = d3.scale.linear()  
+                .domain([100,1300])  
+                .range([10,20]);
+var dom = document.getElementById("container1");
+var myChart = echarts.init(dom,'mySubject');
+var app = {};
+option = null;
+app.title = '力引导布局';
+myChart.showLoading();
+var data={};
+$.getJSON('ForceGraph0Inuse.json', function (graph) {
+	data=graph;
+    myChart.hideLoading();
+    var categories = [];
+    for (var i = 0; i < graph.nodes.length; i++) {
+        categories[i] = {
+            name: '点' + i
+        };
+    }
+    graph.nodes.forEach(function (node) {
+       // node.itemStyle = null;//可以控制symbol颜色
+        
+        node.value = node.symbolSize;
+		node.symbolSize = linear(node.symbolSize);//可以控制symbol大小
+        node.category = node.category;// 分类从0开始取
+        // Use random x, y
+        node.x = node.y = null;
+        node.draggable = true;
+	
+    });
+    option = {
+        title: {
+            text: '挑战赛初步分析',
+            subtext: 'Default layout',
+            top: 40,
+            left: 'right'
+        },
+        tooltip: {
+				 triggerOn:'click',
+				 enterable:'true',
+				},
+        legend: [{
+            // selectedMode: 'single',
+            data: categories.map(function (a) {
+                return a.name;
+            })
+        }],
+        animation: false,
+		calculable: true,
+        series : [
+            {
+                name: 'matrix2',
+                type: 'graph',
+                layout: 'force',
+                data: graph.nodes,//一定要有id
+                links:graph.links ,//getLinks(graph.links,10) 源目的节点使用节点id
+                categories: [{name:'所有'},{name:'ww'},{name:'ee'}],//只是一个名字而已，名字随便设置，但更关注索引
+                roam: true,
+                label: {
+                    normal: {
+					
+                        position: 'right',
+						fontStyle:'oblique'
+                    },	
+					emphasis: {
+                        position: 'right',
+                        show: true
+                    }
+                },
+				lineStyle:{
+					width:1,
+					opacity:1,
+					color:'#444'
+				},
+				draggable:true,
+				focusNodeAdjacency: true,
+                force: {
+					//斥力的大小，影响边的长度
+                    repulsion: 100,
+					//边长的范围
+					edgeLength:[50,80]
+                },
+				//图标可自定义
+				symbol:'circle',
+				symbolSize :10,
+				//边的端点的图标 ,常见箭头：edgeSymbol: ['circle', 'arrow']
+				edgeSymbol: ['none', 'none'],
+				edgeLabel:{
+				},
+				tooltip:{
+					formatter: function (params, ticket, callback) {
+						
+						return JSON.stringify(params).replace(/,/g,'<br />');
+							}
+				},
+				
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+});;
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+
+       </script>
+   </body>
+</html>
