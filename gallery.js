@@ -381,7 +381,7 @@ var gallery = {
                 return d.width / 2
             })//线条粗细
         ;
-        edges_line = d3.selectAll('.edgepath')
+        svg.selectAll('.edgepath')
             .on("click", function (link) {
                 getScatterData([link['source']['id'], link['target']['id']], index);  //重写
             });

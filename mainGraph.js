@@ -80,6 +80,11 @@ var hover_last={stroke_width:2,stroke:"#000"};
             max: -100,
             step:10,
         },
+        perplexity:{
+            min: 10,
+            max: 100,
+            step:1,
+        },
         // verticalAlign: {
         //     options: {
         //         top: 'top',
@@ -94,6 +99,7 @@ var hover_last={stroke_width:2,stroke:"#000"};
     });
     var lastClusterOption='单点聚类';
     app_main.config = {
+        perplexity:30,
         clusterOption: '单点聚类',
         overlapThreshold: 0.01,
         ralationThreshold: 0.01,
@@ -122,6 +128,9 @@ var hover_last={stroke_width:2,stroke:"#000"};
                 if( app_main.config.charge==change || app_main.config.linkDistance==change)
                 {
                     refreshMyChart_main(myChart_main_data);
+                }
+                else if(app_main.config.perplexity==change){
+
                 }
                 else{
                     relationThreshold = app_main.config.ralationThreshold;
@@ -454,7 +463,7 @@ var hover_last={stroke_width:2,stroke:"#000"};
         .style("stroke-width",function(d){return d.width})//线条粗细
         .attr("marker-end", "url(#resolved)" )//根据箭头标记的id号标记箭头
        ;
-    edges_line=d3.selectAll('.edgepath')
+    edges_line=svg.selectAll('.edgepath')
         .on("click",function(link){
             if (app_main.config.clickEdgeAct=='取数据'){
                 getScatterData([link['source']['id'],link['target']['id'] ],0);

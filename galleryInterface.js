@@ -40,7 +40,7 @@ var galleryInterface={
         $.extend(true, selectPoint=[], galleryInterface.now["selectPoint"]);
         similarValue=galleryInterface.now["similarValue"];
         $.extend(true, nodeMap={}, galleryInterface.now["nodeMap"]);
-        $.extend(true, app_main.config={}, galleryInterface.now["main_config"]);
+      //  $.extend(true, app_main.config={}, galleryInterface.now["main_config"]);
         $.extend(true, linkListBuf=[], galleryInterface.now["linkListBuf"])
         $.extend(true, myChart_main_data.links=[], galleryInterface.now["linkListBuf"]);
 
