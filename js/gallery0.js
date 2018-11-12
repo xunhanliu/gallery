@@ -1,3 +1,89 @@
+var galleryDrag = {
+    dragType: "item", //group
+    groupName: null,
+    dragEle: null,
+    lastMousePos: [],
+    itemDragstart: function (ev) {
+        var ele = ev.target;
+        galleryDrag.lastMousePos = [ev.screenX, ev.screenX];
+        var find = findEleAType(ele);
+        if (find == -1) {
+            console.error("itemDragstart  error");
+            return;
+        }
+        galleryDrag.dragType = find[1];
+        galleryDrag.dragEle = find[0];
+        galleryDrag.groupName = find[2];
+        ele.style.opacity = "0.5 !important";
+    },
+    itemDrag: function (ev) {
+        galleryDrag.dragEle.style.transform = "translate(" + (ev.screenX - galleryDrag.lastMousePos[0]) + "px," + (ev.screenY - galleryDrag.lastMousePos[1]) + "px)"
+
+    },
+    // 当放置与不可放置的位置的时候，会触发end ,反之会触发drop, 二者只能触发一个
+    itemDragend: function (ev) //用于被拖动元素放置失败
+    {
+        galleryDrag.dragEle.style.opacity = 1;
+        galleryDrag.dragEle.style.transform = "translate(0,0)"
+    },
+
+
+    itemAllowDrop: function (ev) {
+        ev.preventDefault();
+    },
+
+
+    itemDragenter: function (ev) {  //对其本身会执行一次enter leave
+        //判断同级
+        if (ev.target == galleryDrag.dragEle) return;
+        var find = findEleAType(ev.target);
+        if (moveCase(find) == -1) return;
+
+        var emptyWidth = $(galleryDrag.dragEle).width();
+        var emptyHeight = gallery.item.height;
+
+        //在它后面添加一个空元素
+        var itemMargin = gallery.item.margin;
+
+        var margin = itemMargin.top + "px " + itemMargin.right + "px " + itemMargin.bottom + "px " + itemMargin.left + "px ";
+
+
+        var nextNode = find[0].nextElementSibling;
+        if (nextNode) {
+            if (!$(nextNode).hasClass("gallery_empty")) {
+                $('<div class="gallery_item gallery_empty" style="width:' + emptyWidth + 'px' + ';height:' + emptyHeight + 'px' + ' ;margin:' + margin + '"></div>').insertAfter(find[0]);
+            }
+        }
+        else {
+            $('<div class="gallery_item gallery_empty" style="width:' + emptyWidth + 'px' + ';height:' + emptyHeight + 'px' + ' ;margin:' + margin + '"></div>').insertAfter(find[0]);
+        }
+
+    },
+    itemDragleave: function (ev) {
+        if (ev.target == galleryDrag.dragEle) return;
+
+        var find = findEleAType(ev.target);
+        if (moveCase(find) == -1) return;
+        var nextNode = find[0].nextElementSibling;
+        if (nextNode) {
+            if ($(nextNode).hasClass("gallery_empty")) {
+                $(nextNode).remove();
+            }
+        }
+    },
+
+    itemDrop: function (ev) {
+        galleryDrag.itemDragend();
+        //删空
+        galleryDrag.itemDragleave(ev);
+        var find = findEleAType(ev.target);
+        if (moveCase(find) == -1) return;
+        //append
+        insertAfter(galleryDrag.dragEle, find[0]);
+    }
+};
+
+
 (function () {
 
     var item = gallery.item;
@@ -155,89 +241,4 @@ function moveCase(find) {
     }
     return 0;
 }
-
-var galleryDrag = {
-    dragType: "item", //group
-    groupName: null,
-    dragEle: null,
-    lastMousePos: [],
-    itemDragstart: function (ev) {
-        var ele = ev.target;
-        galleryDrag.lastMousePos = [ev.screenX, ev.screenX];
-        var find = findEleAType(ele);
-        if (find == -1) {
-            console.error("itemDragstart  error");
-            return;
-        }
-        galleryDrag.dragType = find[1];
-        galleryDrag.dragEle = find[0];
-        galleryDrag.groupName = find[2];
-        ele.style.opacity = "0.5 !important";
-    },
-    itemDrag: function (ev) {
-        galleryDrag.dragEle.style.transform = "translate(" + (ev.screenX - galleryDrag.lastMousePos[0]) + "px," + (ev.screenY - galleryDrag.lastMousePos[1]) + "px)"
-
-    },
-    // 当放置与不可放置的位置的时候，会触发end ,反之会触发drop, 二者只能触发一个
-    itemDragend: function (ev) //用于被拖动元素放置失败
-    {
-        galleryDrag.dragEle.style.opacity = 1;
-        galleryDrag.dragEle.style.transform = "translate(0,0)"
-    },
-
-
-    itemAllowDrop: function (ev) {
-        ev.preventDefault();
-    },
-
-
-    itemDragenter: function (ev) {  //对其本身会执行一次enter leave
-        //判断同级
-        if (ev.target == galleryDrag.dragEle) return;
-        var find = findEleAType(ev.target);
-        if (moveCase(find) == -1) return;
-
-        var emptyWidth = $(galleryDrag.dragEle).width();
-        var emptyHeight = gallery.item.height;
-
-        //在它后面添加一个空元素
-        var itemMargin = gallery.item.margin;
-
-        var margin = itemMargin.top + "px " + itemMargin.right + "px " + itemMargin.bottom + "px " + itemMargin.left + "px ";
-
-
-        var nextNode = find[0].nextElementSibling;
-        if (nextNode) {
-            if (!$(nextNode).hasClass("gallery_empty")) {
-                $('<div class="gallery_item gallery_empty" style="width:' + emptyWidth + 'px' + ';height:' + emptyHeight + 'px' + ' ;margin:' + margin + '"></div>').insertAfter(find[0]);
-            }
-        }
-        else {
-            $('<div class="gallery_item gallery_empty" style="width:' + emptyWidth + 'px' + ';height:' + emptyHeight + 'px' + ' ;margin:' + margin + '"></div>').insertAfter(find[0]);
-        }
-
-    },
-    itemDragleave: function (ev) {
-        if (ev.target == galleryDrag.dragEle) return;
-
-        var find = findEleAType(ev.target);
-        if (moveCase(find) == -1) return;
-        var nextNode = find[0].nextElementSibling;
-        if (nextNode) {
-            if ($(nextNode).hasClass("gallery_empty")) {
-                $(nextNode).remove();
-            }
-        }
-    },
-
-    itemDrop: function (ev) {
-        galleryDrag.itemDragend();
-        //删空
-        galleryDrag.itemDragleave(ev);
-        var find = findEleAType(ev.target);
-        if (moveCase(find) == -1) return;
-        //append
-        insertAfter(galleryDrag.dragEle, find[0]);
-    }
-};
 })();
