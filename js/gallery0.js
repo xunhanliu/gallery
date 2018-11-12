@@ -97,6 +97,7 @@ var galleryDrag = {
         .height(item.height).width(item.height);
     $(".gallery_group").css("margin", "0  " + group.margin.right + "px " + "0 " + group.margin.left + "px ")
         .css("padding-left", group.margin.padding_left + "px");
+})();
     //以上是初始化部分
 
 function insertAfter(newElement, targetElement) {
@@ -241,4 +242,3 @@ function moveCase(find) {
     }
     return 0;
 }
-})();
